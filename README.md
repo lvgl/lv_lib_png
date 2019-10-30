@@ -30,3 +30,8 @@ To store a PNG images in flash it needs to be converted to C array with [Online 
     lv_obj_t * img = lv_img_create(lv_scr_act(), NULL);
     lv_img_set_src(img, &my_test_img);
 ```
+
+## Learn more
+To learn more about the PNG decoder itself read [this blog post](https://blog.littlevgl.com/2018-10-05/png_converter)
+
+To learn more about the Image decoder interface of LittlevGL read the realevant part of the [documentation](https://docs.littlevgl.com/en/html/overview/image.html#image-decoder).
