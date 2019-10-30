@@ -16,7 +16,7 @@ Allow the use of PNG images in LittlevGL. This implementation uses [lodepng](htt
 ```
 
 ## Use PNG images from file
-`lodepng` has works POSIX filesystem API. PNG files can be used like this:
+`lodepng` uses the POSIX filesystem API. PNG files can be used like this:
 ```c
 lv_img_set_src(img, "./lv_png_decoder/png_decoder_test.png");
 ```
