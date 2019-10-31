@@ -4,10 +4,10 @@ Allow the use of PNG images in LittlevGL. This implementation uses [lodepng](htt
 
 ## Get started
 - Download or clone this repository
-  - [Download from GitHub](https://github.com/littlevgl/lv_png_decoder/archive/master.zip)
-  - Clone: `git clone https://github.com/littlevgl/lv_png_decoder.git`
-- Include the library: `#include "lv_png_decoder/png_decoder.h"`
-- Initalize the decocer with `lv_png_decoder_init()`
+  - [Download from GitHub](https://github.com/littlevgl/lv_lib_lodepng/archive/master.zip)
+  - Clone: `git clone https://github.com/littlevgl/lv_lib_lodepng.git`
+- Include the library: `#include "lv_lib_lodepng/lv_lodepng.h"`
+- Initalize the decocer with `lv_lodepng_init()`
 - Test with the following code:
 ```c
     LV_IMG_DECLARE(png_decoder_test);
@@ -18,7 +18,7 @@ Allow the use of PNG images in LittlevGL. This implementation uses [lodepng](htt
 ## Use PNG images from file
 `lodepng` uses the POSIX filesystem API. PNG files can be used like this:
 ```c
-lv_img_set_src(img, "./lv_png_decoder/png_decoder_test.png");
+lv_img_set_src(img, "./lv_lib_lodepng/png_decoder_test.png");
 ```
 
 Note that the path of the file might be different.
