@@ -1,10 +1,10 @@
 /**
- * @file png_decoder.h
+ * @file lv_lodepng.h
  *
  */
 
-#ifndef PNG_DECODER_H
-#define PNG_DECODER_H
+#ifndef LV_LODEPNG_H
+#define LV_LODEPNG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +29,7 @@ extern "C" {
 /**
  * Register the PNG decoder functions in LittlevGL
  */
-void lv_png_decoder_init(void);
+void lv_lodepng_init(void);
 
 /**********************
  *      MACROS
@@ -40,4 +40,4 @@ void lv_png_decoder_init(void);
 } /* extern "C" */
 #endif
 
-#endif /*PNG_DECODER_H*/
+#endif /*LV_LODEPNG_H*/
