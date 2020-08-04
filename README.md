@@ -5,9 +5,9 @@ Allow the use of PNG images in LVGL. This implementation uses [lodepng](https://
 ## Get started
 - Download or clone this repository
   - [Download from GitHub](https://github.com/littlevgl/lv_lib_lodepng/archive/master.zip)
-  - Clone: `git clone https://github.com/littlevgl/lv_lib_lodepng.git`
-- Include the library: `#include "lv_lib_lodepng/lv_lodepng.h"`
-- Initalize the decocer with `lv_lodepng_init()`
+  - Clone: `git clone https://github.com/littlevgl/lv_lib_png.git`
+- Include the library: `#include "lv_lib_png/lv_png.h"`
+- Initalize the decocer with `lv_png_init()`
 - Test with the following code:
 ```c
     LV_IMG_DECLARE(png_decoder_test);
