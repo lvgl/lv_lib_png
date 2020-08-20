@@ -387,7 +387,7 @@ static void string_set(char** out, const char* in)
 
 /* ////////////////////////////////////////////////////////////////////////// */
 
-unsigned lodepng_read32bitInt(const unsigned char* buffer)
+static unsigned lodepng_read32bitInt(const unsigned char* buffer)
 {
   return (unsigned)((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]);
 }
@@ -2770,7 +2770,7 @@ unsigned lodepng_can_have_alpha(const LodePNGColorMode* info)
       || lodepng_has_palette_alpha(info);
 }
 
-size_t lodepng_get_raw_size_lct(unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth)
+static size_t lodepng_get_raw_size_lct(unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth)
 {
   size_t bpp = lodepng_get_bpp_lct(colortype, bitdepth);
   size_t n = (size_t)w * (size_t)h;
@@ -3074,13 +3074,6 @@ unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source)
   CERROR_TRY_RETURN(LodePNGUnknownChunks_copy(dest, source));
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
   return 0;
-}
-
-void lodepng_info_swap(LodePNGInfo* a, LodePNGInfo* b)
-{
-  LodePNGInfo temp = *a;
-  *a = *b;
-  *b = temp;
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */

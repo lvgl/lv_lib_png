@@ -6,12 +6,13 @@
 /*********************
  *      INCLUDES
  *********************/
-#if LV_LVGL_H_INCLUDE_SIMPLE
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
 #include <lvgl.h>
 #else
 #include <lvgl/lvgl.h>
 #endif
 
+#include "lv_png.h"
 #include "lodepng.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -84,9 +85,9 @@ static lv_res_t decoder_info(struct _lv_img_decoder * decoder, const void * src,
              if(!file) return LV_RES_INV;
              fseek(file, 16, SEEK_SET);
              uint32_t size[2];
-             fread(size, 1 , 8, file);
+             size_t rn = fread(size, 1 , 8, file);
              fclose(file);
-
+             if(rn != 8) return LV_RES_INV;
              /*Save the data in the header*/
              header->always_zero = 0;
              header->cf = LV_IMG_CF_RAW_ALPHA;
