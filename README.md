@@ -16,10 +16,23 @@ Allow the use of PNG images in LVGL. This implementation uses [lodepng](https://
 ```
 
 ## Use PNG images from file
-`lodepng` uses the POSIX filesystem API. PNG files can be used like this:
+By deafult `lodepng` uses C file IO API (e.g. `fopen`) and images can be opened like this:
 ```c
 lv_img_set_src(img, "./lv_lib_lodepng/png_decoder_test.png");
 ```
+
+If you want to make `lodepng` to use LVGL's file system API add `#define LV_PNG_USE_LV_FILESYSTEM  1` to the end of your`lv_conf.h`.
+In this case you need to [register a driver](https://docs.lvgl.io/latest/en/html/overview/file-system.html) fo LVGL. The following functions are required:
+- `open_cb()`
+- `read_cb()`
+- `close_cb()`
+- `size_cb()`
+
+After that fiels can be opened like this:
+```c
+lv_img_set_src(img, "P:lv_lib_lodepng/png_decoder_test.png");
+```
+
 
 Note that the path of the file might be different.
 
