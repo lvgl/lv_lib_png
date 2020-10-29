@@ -28,11 +28,17 @@ freely, subject to the following restrictions:
 
 #include <string.h> /*for size_t*/
 
-#include "lvgl/lvgl.h"
-
 #ifndef LV_PNG_USE_LV_FILESYSTEM
 #define LV_PNG_USE_LV_FILESYSTEM 0
 #endif
+
+#if LV_PNG_USE_LV_FILESYSTEM
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#include <lvgl.h>
+#else
+#include <lvgl/lvgl.h>
+#endif
+#endif /* LV_PNG_USE_LV_FILESYSTEM */
 
 extern const char* LODEPNG_VERSION_STRING;
 
