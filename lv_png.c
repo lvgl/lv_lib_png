@@ -1,12 +1,18 @@
 /**
- * @file lv_lodepng.c
+ * @file lv_png.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lvgl/lvgl.h"
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+#include <lvgl.h>
+#else
+#include <lvgl/lvgl.h>
+#endif
+
+#include "lv_png.h"
 #include "lodepng.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,7 +48,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 /**
  * Register the PNG decoder functions in LittlevGL
  */
-void lv_lodepng_init(void)
+void lv_png_init(void)
 {
     lv_img_decoder_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
@@ -74,14 +80,25 @@ static lv_res_t decoder_info(struct _lv_img_decoder * decoder, const void * src,
               * [16..23]: width
               * [24..27]: height
               */
+             uint32_t size[2];
+#if LV_PNG_USE_LV_FILESYSTEM
+             lv_fs_file_t f;
+             lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
+             if(res != LV_FS_RES_OK) return -1;
+             lv_fs_seek(&f, 16);
+             uint32_t rn;
+             lv_fs_read(&f, &size, 8, &rn);
+             if(rn != 8) return LV_RES_INV;
+             lv_fs_close(&f);
+#else
              FILE* file;
              file = fopen(fn, "rb" );
              if(!file) return LV_RES_INV;
              fseek(file, 16, SEEK_SET);
-             uint32_t size[2];
-             fread(size, 1 , 8, file);
+             size_t rn = fread(size, 1 , 8, file);
              fclose(file);
-
+             if(rn != 8) return LV_RES_INV;
+#endif
              /*Save the data in the header*/
              header->always_zero = 0;
              header->cf = LV_IMG_CF_RAW_ALPHA;

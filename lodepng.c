@@ -387,7 +387,7 @@ static void string_set(char** out, const char* in)
 
 /* ////////////////////////////////////////////////////////////////////////// */
 
-unsigned lodepng_read32bitInt(const unsigned char* buffer)
+static unsigned lodepng_read32bitInt(const unsigned char* buffer)
 {
   return (unsigned)((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]);
 }
@@ -420,8 +420,17 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value)
 /* returns negative value on error. This should be pure C compatible, so no fstat. */
 static long lodepng_filesize(const char* filename)
 {
-  FILE* file;
+#if LV_PNG_USE_LV_FILESYSTEM
+    lv_fs_file_t f;
+    lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
+    if(res != LV_FS_RES_OK) return -1;
+    uint32_t size = 0;
+    lv_fs_size(&f, &size);
+    lv_fs_close(&f);
+    return size;
+#else
   long size;
+  FILE* file;
   file = fopen(filename, "rb");
   if(!file) return -1;
 
@@ -437,11 +446,24 @@ static long lodepng_filesize(const char* filename)
 
   fclose(file);
   return size;
+#endif
 }
 
 /* load file into buffer that already has the correct allocated size. Returns error code.*/
 static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char* filename)
 {
+#if LV_PNG_USE_LV_FILESYSTEM
+    lv_fs_file_t f;
+    lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
+    if(res != LV_FS_RES_OK) return 78;
+
+    uint32_t br;
+    res = lv_fs_read(&f, out, size, &br);
+    if(res != LV_FS_RES_OK) return 78;
+    if (br != size) return 78;
+    lv_fs_close(&f);
+    return 0;
+#else
   FILE* file;
   size_t readsize;
   file = fopen(filename, "rb");
@@ -452,6 +474,7 @@ static unsigned lodepng_buffer_file(unsigned char* out, size_t size, const char*
 
   if (readsize != size) return 78;
   return 0;
+#endif
 }
 
 unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* filename)
@@ -464,17 +487,6 @@ unsigned lodepng_load_file(unsigned char** out, size_t* outsize, const char* fil
   if(!(*out) && size > 0) return 83; /*the above malloc failed*/
 
   return lodepng_buffer_file(*out, (size_t)size, filename);
-}
-
-/*write given buffer to the file, overwriting the file, it doesn't append to it.*/
-unsigned lodepng_save_file(const unsigned char* buffer, size_t buffersize, const char* filename)
-{
-  FILE* file;
-  file = fopen(filename, "wb" );
-  if(!file) return 79;
-  fwrite((char*)buffer , 1 , buffersize, file);
-  fclose(file);
-  return 0;
 }
 
 #endif /*LODEPNG_COMPILE_DISK*/
@@ -2770,7 +2782,7 @@ unsigned lodepng_can_have_alpha(const LodePNGColorMode* info)
       || lodepng_has_palette_alpha(info);
 }
 
-size_t lodepng_get_raw_size_lct(unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth)
+static size_t lodepng_get_raw_size_lct(unsigned w, unsigned h, LodePNGColorType colortype, unsigned bitdepth)
 {
   size_t bpp = lodepng_get_bpp_lct(colortype, bitdepth);
   size_t n = (size_t)w * (size_t)h;
@@ -3074,13 +3086,6 @@ unsigned lodepng_info_copy(LodePNGInfo* dest, const LodePNGInfo* source)
   CERROR_TRY_RETURN(LodePNGUnknownChunks_copy(dest, source));
 #endif /*LODEPNG_COMPILE_ANCILLARY_CHUNKS*/
   return 0;
-}
-
-void lodepng_info_swap(LodePNGInfo* a, LodePNGInfo* b)
-{
-  LodePNGInfo temp = *a;
-  *a = *b;
-  *b = temp;
 }
 
 /* ////////////////////////////////////////////////////////////////////////// */
@@ -5987,29 +5992,6 @@ unsigned lodepng_encode24(unsigned char** out, size_t* outsize, const unsigned c
   return lodepng_encode_memory(out, outsize, image, w, h, LCT_RGB, 8);
 }
 
-#ifdef LODEPNG_COMPILE_DISK
-unsigned lodepng_encode_file(const char* filename, const unsigned char* image, unsigned w, unsigned h,
-                             LodePNGColorType colortype, unsigned bitdepth)
-{
-  unsigned char* buffer;
-  size_t buffersize;
-  unsigned error = lodepng_encode_memory(&buffer, &buffersize, image, w, h, colortype, bitdepth);
-  if(!error) error = lodepng_save_file(buffer, buffersize, filename);
-  lodepng_free(buffer);
-  return error;
-}
-
-unsigned lodepng_encode32_file(const char* filename, const unsigned char* image, unsigned w, unsigned h)
-{
-  return lodepng_encode_file(filename, image, w, h, LCT_RGBA, 8);
-}
-
-unsigned lodepng_encode24_file(const char* filename, const unsigned char* image, unsigned w, unsigned h)
-{
-  return lodepng_encode_file(filename, image, w, h, LCT_RGB, 8);
-}
-#endif /*LODEPNG_COMPILE_DISK*/
-
 void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings)
 {
   lodepng_compress_settings_init(&settings->zlibsettings);
@@ -6144,22 +6126,6 @@ const char* lodepng_error_text(unsigned code)
 #ifdef LODEPNG_COMPILE_CPP
 namespace lodepng
 {
-
-#ifdef LODEPNG_COMPILE_DISK
-unsigned load_file(std::vector<unsigned char>& buffer, const std::string& filename)
-{
-  long size = lodepng_filesize(filename.c_str());
-  if(size < 0) return 78;
-  buffer.resize((size_t)size);
-  return size == 0 ? 0 : lodepng_buffer_file(&buffer[0], (size_t)size, filename.c_str());
-}
-
-/*write given buffer to the file, overwriting the file, it doesn't append to it.*/
-unsigned save_file(const std::vector<unsigned char>& buffer, const std::string& filename)
-{
-  return lodepng_save_file(buffer.empty() ? 0 : &buffer[0], buffer.size(), filename.c_str());
-}
-#endif /* LODEPNG_COMPILE_DISK */
 
 #ifdef LODEPNG_COMPILE_ZLIB
 #ifdef LODEPNG_COMPILE_DECODER
