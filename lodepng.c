@@ -29,6 +29,9 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 */
 
 #include "lodepng.h"
+#ifdef LV_PNG_USE_PSRAM
+#include <esp_heap_caps.h>
+#endif
 
 #ifdef MEM_BLOCK  
 #include "block.h"
@@ -124,7 +127,11 @@ static void* lodepng_malloc(size_t size)
   if(size > LODEPNG_MAX_ALLOC) return 0;
 #endif
   // printf("%s - %zd\n", __FUNCTION__, size);
+#ifdef LV_PNG_USE_PSRAM
+  return heap_caps_malloc(size, MALLOC_CAP_SPIRAM);
+#else
   return malloc(size);
+#endif
 }
 
 static void* lodepng_realloc(void* ptr, size_t new_size)
@@ -133,13 +140,21 @@ static void* lodepng_realloc(void* ptr, size_t new_size)
   if(new_size > LODEPNG_MAX_ALLOC) return 0;
 #endif
   // printf("%s - %zd\n", __FUNCTION__, new_size);
+#ifdef LV_PNG_USE_PSRAM
+  return heap_caps_realloc(ptr, new_size, MALLOC_CAP_SPIRAM);
+#else
   return realloc(ptr, new_size);
+#endif
 }
 
 static void lodepng_free(void* ptr)
 {
   // printf("%s\n", __FUNCTION__);
+#ifdef LV_PNG_USE_PSRAM
+  heap_caps_free(ptr);
+#else
   free(ptr);
+#endif
 }
 #endif
 #else /*LODEPNG_COMPILE_ALLOCATORS*/
