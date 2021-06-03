@@ -85,7 +85,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
              lv_fs_file_t f;
              lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
              if(res != LV_FS_RES_OK) return -1;
-             lv_fs_seek(&f, 16);
+             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
              uint32_t rn;
              lv_fs_read(&f, &size, 8, &rn);
              if(rn != 8) return LV_RES_INV;
@@ -216,7 +216,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
     lv_color_t * img_c = (lv_color_t *) img;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
-        c = LV_COLOR_MAKE(img_argb[i].ch.red, img_argb[i].ch.green, img_argb[i].ch.blue);
+        c = lv_color_make(img_argb[i].ch.red, img_argb[i].ch.green, img_argb[i].ch.blue);
         img_c[i].ch.red = c.ch.blue;
         img_c[i].ch.blue = c.ch.red;
     }
@@ -225,7 +225,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
     lv_color_t c;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
-        c = LV_COLOR_MAKE(img_argb[i].ch.blue, img_argb[i].ch.green, img_argb[i].ch.red);
+        c = lv_color_make(img_argb[i].ch.blue, img_argb[i].ch.green, img_argb[i].ch.red);
         img[i*3 + 2] = img_argb[i].ch.alpha;
         img[i*3 + 1] = c.full >> 8;
         img[i*3 + 0] = c.full & 0xFF;
@@ -235,7 +235,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
        lv_color_t c;
        uint32_t i;
        for(i = 0; i < px_cnt; i++) {
-           c = LV_COLOR_MAKE(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
+           c = lv_color_make(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
            img[i*3 + 1] = img_argb[i].alpha;
            img[i*3 + 0] = c.full
        }

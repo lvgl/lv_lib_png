@@ -29,6 +29,11 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 */
 
 #include "lodepng.h"
+#if LV_LVGL_H_INCLUDE_SIMPLE
+#include <lvgl.h>
+#else
+#include <lvgl/lvgl.h>
+#endif
 
 #ifdef LODEPNG_COMPILE_DISK
 #include <limits.h> /* LONG_MAX */
@@ -348,7 +353,12 @@ static long lodepng_filesize(const char* filename) {
     lv_fs_res_t res = lv_fs_open(&f, filename, LV_FS_MODE_RD);
     if(res != LV_FS_RES_OK) return -1;
     uint32_t size = 0;
-    lv_fs_size(&f, &size);
+    if(lv_fs_seek(&f, 0, SEEK_END) != 0) {
+      lv_fs_close(&f);
+      return -1;
+    }
+
+    lv_fs_tell(&f, &size);
     lv_fs_close(&f);
     return size;
 #else
