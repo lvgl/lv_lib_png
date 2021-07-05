@@ -197,10 +197,13 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_decoder_t *decoder, lv_img_decoder_dsc_t *dsc)
 {
-    (void) decoder; /*Unused*/
-    if(dsc->img_data) free((uint8_t *)dsc->img_data);
+    (void)decoder; /*Unused*/
+    if (dsc->img_data) {
+        free((uint8_t *)dsc->img_data);
+        dsc->img_data = NULL;
+    }
 }
 
 /**
