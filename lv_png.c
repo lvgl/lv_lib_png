@@ -239,8 +239,8 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
        uint32_t i;
        for(i = 0; i < px_cnt; i++) {
            c = lv_color_make(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
-           img[i*3 + 1] = img_argb[i].alpha;
-           img[i*3 + 0] = c.full
+           img[i*2 + 1] = img_argb[i].alpha;
+           img[i*2 + 0] = c.full
        }
 #endif
 }
