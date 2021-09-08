@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include <lvgl.h>
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+#include "lvgl.h"
 #else
-#include <lvgl/lvgl.h>
+#include "lvgl/lvgl.h"
 #endif
 
 #include "lv_png.h"
@@ -84,7 +84,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
 #if LV_PNG_USE_LV_FILESYSTEM
              lv_fs_file_t f;
              lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-             if(res != LV_FS_RES_OK) return -1;
+             if(res != LV_FS_RES_OK) return LV_RES_INV;
              lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
              uint32_t rn;
              lv_fs_read(&f, &size, 8, &rn);
