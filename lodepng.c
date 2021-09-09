@@ -29,11 +29,6 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 */
 
 #include "lodepng.h"
-#if LV_LVGL_H_INCLUDE_SIMPLE
-#include <lvgl.h>
-#else
-#include <lvgl/lvgl.h>
-#endif
 
 #ifdef LODEPNG_COMPILE_DISK
 #include <limits.h> /* LONG_MAX */
@@ -617,7 +612,7 @@ static unsigned readBits(LodePNGBitReader* reader, size_t nbits) {
 }
 
 /* Public for testing only. steps and result must have numsteps values. */
-unsigned lode_png_test_bitreader(const unsigned char* data, size_t size,
+static unsigned lode_png_test_bitreader(const unsigned char* data, size_t size,
                                  size_t numsteps, const size_t* steps, unsigned* result) {
   size_t i;
   LodePNGBitReader reader;
@@ -3635,7 +3630,7 @@ function, do not use to process all pixels of an image. Alpha channel not suppor
 this is for bKGD, supporting alpha may prevent it from finding a color in the palette, from the
 specification it looks like bKGD should ignore the alpha values of the palette since it can use
 any palette index but doesn't have an alpha channel. Idem with ignoring color key. */
-unsigned lodepng_convert_rgb(
+static unsigned lodepng_convert_rgb(
     unsigned* r_out, unsigned* g_out, unsigned* b_out,
     unsigned r_in, unsigned g_in, unsigned b_in,
     const LodePNGColorMode* mode_out, const LodePNGColorMode* mode_in) {
