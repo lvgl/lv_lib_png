@@ -44,6 +44,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+void lodepng_free(void* ptr);
 
 /**
  * Register the PNG decoder functions in LittlevGL
@@ -159,8 +160,11 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
             /*Decode the loaded image in ARGB8888 */
             error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
-            free(png_data); /*Free the loaded file*/
+            lodepng_free(png_data); /*Free the loaded file*/
             if(error) {
+                if(img_data != NULL) {
+                    lodepng_free(img_data);
+                }
                 printf("error %u: %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
             }
@@ -181,6 +185,9 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         error = lodepng_decode32(&img_data, &png_width, &png_height, img_dsc->data, img_dsc->data_size);
 
         if(error) {
+            if(img_data != NULL) {
+                lodepng_free(img_data);
+            }
             return LV_RES_INV;
         }
 
@@ -200,7 +207,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     (void) decoder; /*Unused*/
-    if(dsc->img_data) free((uint8_t *)dsc->img_data);
+    if(dsc->img_data) lodepng_free((uint8_t *)dsc->img_data);
 }
 
 /**
