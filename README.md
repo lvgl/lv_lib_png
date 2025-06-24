@@ -1,6 +1,6 @@
 # PNG decoder for LVGL
 
-**This repository is merged into the lvgl repository. See https://docs.lvgl.io/master/libs/png.html**
+**This repository is merged into the lvgl repository and archived. See https://docs.lvgl.io/master/details/libs/lodepng.html**
 
 Allow the use of PNG images in LVGL. This implementation uses [lodepng](https://github.com/lvandeve/lodepng) library.
 
